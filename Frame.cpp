@@ -12,6 +12,7 @@ Frame::Frame(std::string title) : wxFrame(nullptr, wxID_ANY, title, wxDefaultPos
 
 	gridCliente = new wxGrid(pnl, wxID_ANY, wxPoint(200, 170), wxSize(-1, -1));
 	gridCliente->CreateGrid(0, 0);
+	gridCliente->Bind(wxEVT_GRID_CELL_CHANGED, &Frame::OnGridCellChange, this);
 	
 	new wxStaticText(pnl, wxID_ANY, "Nome cliente", wxPoint(20, 20), wxSize(-1, -1));
 	cliCampoNome = new wxTextCtrl(pnl, wxID_ANY, "", wxPoint(20, 40), wxSize(200, -1));
@@ -138,4 +139,23 @@ void Frame::on_btnExcluir_clicked(wxCommandEvent& evt)
 		}
 	}
 		
+}
+void Frame::OnGridCellChange(wxGridEvent& evt)
+{
+	int row = evt.GetRow(), col = evt.GetCol();
+
+	wxString idStr = gridCliente->GetCellValue(row, 0);
+	wxString novoValor = gridCliente->GetCellValue(row, col);
+	std::string campoBanco;
+	if (col == 1)
+		campoBanco = "nome";
+	else if (col == 2)
+		campoBanco = "email";
+	else
+		return;
+
+	std::string sql = "UPDATE clientes SET " + campoBanco + " = '" +
+		db->escape(novoValor.ToStdString()) + "' " + "WHERE id = " + idStr.ToStdString();
+	if(db->execute(sql))
+		wxMessageBox("Cliente ID " + idStr + " alterado", "Alteração", wxICON_WARNING);
 }
