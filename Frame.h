@@ -14,6 +14,7 @@ public:
     void on_btnExcluir_clicked(wxCommandEvent& evt);
     void carregaDados(std::string sql);
     void carregaDados();
+    void OnGridCellChange(wxGridEvent& evt); 
 private:
     MySQLDatabase* db;
     wxPanel* pnl;
